@@ -8,7 +8,9 @@ for x in $CMDLINE; do
 done
 
 if [ -z "$SERVER" ]; then
+	clear
 	echo server not set in kernel cmdline, aborting boot process
+	sleep 5
 	exit
 fi
 
