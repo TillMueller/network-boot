@@ -2,7 +2,7 @@
 
 This project aims to enable the modification of a file system attached to the machine before booting the actual kernel either from disk or a network location.
 
-### Features:
+### Features
 - Add files to any place on any filesystem connected to the machine
 - Connect to the machine via SSH during this phase to make manual changes or debug boot issues
 - Freely choose which kernel / initramfs / cmdline should be used for the final boot
