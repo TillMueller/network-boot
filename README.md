@@ -28,7 +28,7 @@ This project aims to enable the modification of a file system attached to the ma
 	find | cpio -o -H newc | gzip -4 > ../{NAME OF THE PATCHED INITRD ARCHIVE}
 	```
 
-5. On the HTTP server, clone the ```network-boot-http``` repository so that ```http://{YOUR SERVER IP}/config.sh``` accesses the ```config.sh``` file. It is important that this file exists and is called ```config.sh``` since the start-up script will try to load and execute it. Additionally, the system will try to get an ```index.html``` from the HTTP server. This file is downloaded and then displayed during the inital boot process using ```cat```.
+5. On the HTTP server, clone the ```network-boot-http``` repository so that ```http://{YOUR SERVER IP}/config.sh``` accesses the ```config.sh``` file. It is important that this file exists and is called ```config.sh``` since the start-up script will try to load and execute it. Additionally, the system will try to get an ```index.html``` from the HTTP server. This file is downloaded and then displayed during the inital boot process using ```cat```. If ```index.html``` does not exist, ```wget``` will display an error during boot, which can be ignored.
 
 6. Boot using the newly created initrd and the latest Debian Buster Kernel (tested with ```vmlinuz-4.19.0-5-amd64```) via KVM direct kernel boot or PXE. For the system to work the kernel boot parameters have to contain a ```server={IP OF YOUR HTTP SERVER}``` setting.
 
