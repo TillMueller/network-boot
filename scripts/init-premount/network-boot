@@ -20,13 +20,13 @@ clear
 ip a
 echo Using server $SERVER
 sleep 5
-while [[ $(netstat -t | grep 22 | wc -l) -gt 0 ]]; do
-	if [[ $(cat /network-boot/cancel_boot) -eq 1 ]]; then
-		exit
-	fi
+while [[ $(netstat -t | grep :23 | wc -l) -gt 0 ]]; do
 	echo Found active SSH session, not booting for 30 seconds...
 	echo To stop the machine from booting completely, do \"echo 1 \> /network-boot/cancel_boot\"
 	sleep 30
+	if [[ $(cat /network-boot/cancel_boot) -eq 1 ]]; then
+		exit
+	fi
 done
 wget -q -O /network-boot/config.sh $SERVER/config.sh
 chmod +x /network-boot/config.sh
