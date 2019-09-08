@@ -1,0 +1,19 @@
+abort_boot_ssh() {
+	start_dropbear
+	abort_boot "$@"
+}
+
+abort_boot() {
+	echo BOOT FAILURE - REASON: "$@" >> /boot_log
+	echo
+	cat /boot_log
+	panic
+}
+
+start_dropbear() {
+	configure_networking
+	/bootstrap/dropbear/dropbear_start
+	echo
+	echo SSH started
+	ip a
+}

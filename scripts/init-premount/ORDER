@@ -1,4 +1,0 @@
-/scripts/init-premount/dropbear "$@"
-[ -e /conf/param.conf ] && . /conf/param.conf
-/scripts/init-premount/network-boot
-[ -e /conf/param.conf ] && . /conf/param.conf
