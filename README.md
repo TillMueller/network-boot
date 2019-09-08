@@ -28,7 +28,7 @@ This project aims to enable the modification of a file system attached to the ma
 	find | cpio -o -H newc | gzip -4 > ../{NAME OF THE PATCHED INITRD ARCHIVE}
 	```
 5. Get the source for the linux kernel ```apt install linux-source-4.19```, extract it ```tar xf /usr/src/linux-source-4.19.tar.xz``` and switch into the directory ```cd linux-source-4.19```
-6. Create config by running ```make localyesconfig``` and answering all questions with "no". Now disable signature checking by running ```scripts/config --disable MODULE_SIG```
+6. Create config by running ```make localyesconfig``` and answering all questions with "no". Now disable signature checking by running ```scripts/config --disable MODULE_SIG```. A config created using a qemu debian virtual machine can be found under ```.config``` included in this repository
 7. Copy the patched INITRD archive from above into the folder as ```initramfs_data.cpio.gz```
 8. Edit the ```.config``` file on line 161 to add the initramfs archive from above to the kernel: ```CONFIG_INITRAMFS_SOURCE="initramfs_data.cpio.gz"```
 9. Compile the kernel by running ```make -j $(nproc) bzImage``` answering all questions with the default answer by pressing return. The kernel will appear in ```arch/x86/boot/bzImage``` and can now be used to boot virtual machines using KVM direct kernel boot.
