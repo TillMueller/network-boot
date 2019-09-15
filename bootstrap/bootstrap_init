@@ -78,7 +78,9 @@ if [ -z "$SERVER" ]; then
 	mkdir /mnt
 	mount -t "$FILESYSTEM" "$ROOT" /mnt >> $LOGFILE 2>&1
 	#copy files from overlay given by initrams, if they exist 
-	[ -d /fs_overlay ] && cp -r /fs_overlay/* /mnt/
+	if [ -f /fs_overlay.tar ]; then
+	       	tar -zxvf /fs_overlay.tar -C /mnt
+	fi
 
 	#now we need to decide which kernel / initrd to use
 	#if they were not set in the cmdline, we'll try whether the
@@ -95,16 +97,16 @@ if [ -z "$SERVER" ]; then
 				abort_boot_ssh No kernel found, maybe mount failed
 			fi
 			#symlink wasn't set, but there is a kernel we can use in /boot
-			SCNDKERNEL="${POSSIBLEKERNEL//mnt}"
+			SCNDKERNEL="${POSSIBLEKERNEL/\/mnt}"
 			#if there is a kernel there, there should also be an initrd
 			POSSIBLEINITRD=$(ls /mnt/boot/initrd.img-* -v | tail -n 1)
 			if [ -z "$POSSIBLEINITRD" ]; then
 				abort_boot_ssh kernel found in /boot, but no initrd
 			fi
-			SCNDINITRD="${POSSIBLEINITRD//mnt}"
-			if [ ${SCNDINITRD//boot/initrd.img-*} != ${SCNDKERNEL//boot/vmlinuz-*} ]
-				abort_boot_ssh kernel and initrd found in /boot, but their versions do not match
-			fi
+			SCNDINITRD="${POSSIBLEINITRD/\/mnt}"
+			if [ ${SCNDINITRD/\/boot\/initrd.img-} != ${SCNDKERNEL/\/boot\/vmlinuz-} ]; then
+				abort_boot_ssh kernel and initrd found in /boot, but their versions do not match: $SCNDKERNEL vs. $SCNDINITRD
+			fi;
 		else
 			#symlink exists
 			SCNDKERNEL="/vmlinuz"
