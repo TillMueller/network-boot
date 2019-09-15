@@ -57,11 +57,11 @@ if [ "$SSH" = true ]; then
 	if [ "$STOP" = true ]; then
 		abort_boot \"stop\" set, keeping SSH running and dropping to console
 	fi
-	echo Waiting for 10 seconds...
+	echo "Waiting for 10 seconds..."
 	sleep 10
-	while [[ $(netstat -t | grep :23 | wc -l) -gt 0 ]]; do
-		echo Found active SSH session, not booting for 30 seconds...
-		echo To stop the machine from booting completely, do \"echo 1 \> /bootstrap/cancel_boot\"
+	while [[ $(netstat -t | grep -c :23) -gt 0 ]]; do
+		echo "Found active SSH session, not booting for 30 seconds..."
+		echo "To stop the machine from booting completely, do \"echo 1 \> /bootstrap/cancel_boot\""
 		sleep 30
 		if [[ $(cat /bootstrap/cancel_boot) -eq 1 ]]; then
 			abort_boot boot halted by \"/bootstrap/cancel_boot\"
@@ -76,7 +76,7 @@ fi
 if [ -z "$SERVER" ]; then
 	echo No server set, trying to boot from HDD
 	mkdir /mnt
-	mount -t $FILESYSTEM $ROOT /mnt >> $LOGFILE 2>&1
+	mount -t "$FILESYSTEM" "$ROOT" /mnt >> $LOGFILE 2>&1
 	#copy files from overlay given by initrams, if they exist 
 	[ -d /fs_overlay ] && cp -r /fs_overlay/* /mnt/
 
@@ -88,7 +88,7 @@ if [ -z "$SERVER" ]; then
 	if [ "$SCNDKERNEL" = default ]; then
 		if [ ! -f /mnt/vmlinuz ]; then
 			#symlink doesn't exist, but maybe there's something in /boot
-			POSSIBLEKERNEL=$(ls /mnt/boot/vmlinuz-* -1 | tail -n 1)
+			POSSIBLEKERNEL=$(ls /mnt/boot/vmlinuz-* -v | tail -n 1)
 			if [ -z "$POSSIBLEKERNEL" ]; then
 				#No kernel is set, the symlink doesn't exist and
 				#we didn't find anything suitable in /boot
@@ -97,11 +97,14 @@ if [ -z "$SERVER" ]; then
 			#symlink wasn't set, but there is a kernel we can use in /boot
 			SCNDKERNEL="${POSSIBLEKERNEL//mnt}"
 			#if there is a kernel there, there should also be an initrd
-			POSSIBLEINITRD=$(ls /mnt/boot/initrd.img-* -1 | tail -n 1)
+			POSSIBLEINITRD=$(ls /mnt/boot/initrd.img-* -v | tail -n 1)
 			if [ -z "$POSSIBLEINITRD" ]; then
 				abort_boot_ssh kernel found in /boot, but no initrd
 			fi
 			SCNDINITRD="${POSSIBLEINITRD//mnt}"
+			if [ ${SCNDINITRD//boot/initrd.img-*} != ${SCNDKERNEL//boot/vmlinuz-*} ]
+				abort_boot_ssh kernel and initrd found in /boot, but their versions do not match
+			fi
 		else
 			#symlink exists
 			SCNDKERNEL="/vmlinuz"
@@ -123,7 +126,7 @@ if [ -z "$SERVER" ]; then
 fi
 
 clear
-echo Booting via HTTP using server $SERVER
-wget -q -O /bootstrap/network-boot/config.sh $SERVER/config.sh
+echo Booting via HTTP using server "$SERVER"
+wget -q -O /bootstrap/network-boot/config.sh "$SERVER"/config.sh
 chmod +x /bootstrap/network-boot/config.sh
 /bootstrap/network-boot/config.sh
